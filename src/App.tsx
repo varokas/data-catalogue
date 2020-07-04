@@ -2,27 +2,65 @@ import React, { useState } from 'react';
 import './App.css';
 
 import {Catalogue, Column, ColumnType, Table} from './data';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useParams
+} from "react-router-dom";
 
 function App() {
   const [searhText, setSearchText] = useState("");
 
   return (
-    <div>
-      <h1>Catalogue</h1>
-      Search: <input type="text" value={searhText} onChange={(event) => setSearchText(event.target.value)}/>
-      { catalogue.tables.map(table => <TableView data={table} filter={searhText} />)}
-    </div>
+    <Router>
+      <Link to="/">Home</Link>
+      <ul>
+        { 
+          catalogue.tables.map( table => <li><Link to={`/${table.name}`}>{table.name}</Link></li>)
+        }
+      </ul>
+      <hr/>
+      <Switch>
+        <Route path="/:tableName" children={<TablePage data={catalogue}/>} />
+        <Route path="/" children={
+          <div>
+            <h1>Catalogue</h1>
+            Search: <input type="text" value={searhText} onChange={(event) => setSearchText(event.target.value)}/>
+            { catalogue.tables.map(table => <TableView data={table} filter={searhText} />)}
+          </div>
+        }/>
+      </Switch>
+    </Router>
+  );
+}
+
+type TablePageProps = {
+  data: Catalogue
+}
+function TablePage({data}:TablePageProps) {
+  let { tableName } = useParams();
+
+  let table = data.tables.find( t => t.name === tableName)
+
+  return (
+    <TableView data={table}/>
   );
 }
 
 type TableViewProps = {
-  filter: string
-  data: Table
+  filter?: string
+  data?: Table
 }
 function TableView({data, filter}: TableViewProps) {
+  if (data === undefined) {
+    return <div></div>
+  }
+
   return (
     <div>
-      <h2>{data.name}</h2>
+      <h2><Link to={`/${data.name}`}>{data.name}</Link></h2>
       <table>
         <thead>
           <tr>
@@ -33,7 +71,7 @@ function TableView({data, filter}: TableViewProps) {
           </tr>
         </thead>
         {data.columns
-          .filter(column => column.name.includes(filter))
+          .filter(column => column.name.includes(filter !== undefined ? filter : ""))
           .map(column => (
           <tr>
             <td>{column.name}</td>

@@ -11,7 +11,7 @@ import {
 } from "react-router-dom";
 import { AppBar, Toolbar, Typography, IconButton, InputBase, TableContainer, Table as TableUI, TableBody, TableHead, TableRow, TableCell, Paper } from '@material-ui/core';
 import { fade, makeStyles } from '@material-ui/core/styles';
-import { Menu as MenuIcon, Search as SearchIcon } from '@material-ui/icons';
+import { Menu as MenuIcon, Search as SearchIcon, Link as LinkIcon } from '@material-ui/icons';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -154,9 +154,14 @@ function TableView({data, filter}: TableViewProps) {
     return <div></div>
   }
 
+  let filteredColumns = data.columns.filter(column => column.name.toLowerCase().includes(filter !== undefined ? filter.toLowerCase() : ""))
+  if (filteredColumns.length == 0) {
+    return <div></div>
+  }
+
   return (
     <div>
-      <Typography variant="h6"><Link to={`/${data.name}`}>{data.name}</Link></Typography>
+      <Typography variant="h6">{data.name} <Link to={`/${data.name}`}><LinkIcon/></Link></Typography>
       {/* <TableContainer component={Paper}> */}
         <TableUI size="small" aria-label="simple table" style={{width: 0}}>
           <TableHead>

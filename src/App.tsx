@@ -9,8 +9,69 @@ import {
   Link,
   useParams
 } from "react-router-dom";
+import { AppBar, Toolbar, Typography, IconButton, InputBase, TableContainer, Table as TableUI, TableBody, TableHead, TableRow, TableCell, Paper } from '@material-ui/core';
+import { fade, makeStyles } from '@material-ui/core/styles';
+import { Menu as MenuIcon, Search as SearchIcon } from '@material-ui/icons';
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1,
+  },
+  menuButton: {
+    marginRight: theme.spacing(2),
+  },
+  title: {
+    flexGrow: 1,
+    display: 'none',
+    [theme.breakpoints.up('sm')]: {
+      display: 'block',
+    },
+  },
+  search: {
+    position: 'relative',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: fade(theme.palette.common.white, 0.15),
+    '&:hover': {
+      backgroundColor: fade(theme.palette.common.white, 0.25),
+    },
+    marginLeft: 0,
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      marginLeft: theme.spacing(1),
+      width: 'auto',
+    },
+  },
+  searchIcon: {
+    padding: theme.spacing(0, 2),
+    height: '100%',
+    position: 'absolute',
+    pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inputRoot: {
+    color: 'inherit',
+  },
+  inputInput: {
+    padding: theme.spacing(1, 1, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
+    transition: theme.transitions.create('width'),
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      width: '12ch',
+      '&:focus': {
+        width: '20ch',
+      },
+    },
+  },
+}));
+
 
 function App() {
+  const classes = useStyles();
+
   const [searhText, setSearchText] = useState("")
   const [catalogue, setCatalogue] = useState<Catalogue>({tables: []})
 
@@ -23,7 +84,35 @@ function App() {
 
   return (
     <Router>
-      <Link to="/">Home</Link>
+      <div className={classes.root}>
+        <AppBar position="static">
+          <Toolbar>
+              {/* <IconButton edge="start" color="inherit" aria-label="menu">
+                <MenuIcon />
+              </IconButton> */}
+              <Typography variant="h6" className={classes.title}>
+                <Link to="/" style={{textDecoration: 'none', color: '#fff'}} >
+                  Data Catalogue
+                </Link>  
+              </Typography>
+            <div className={classes.search}>
+              <div className={classes.searchIcon}>
+                <SearchIcon />
+              </div>
+              <InputBase
+                placeholder="Search…"
+                classes={{
+                  root: classes.inputRoot,
+                  input: classes.inputInput,
+                }}
+                inputProps={{ 'aria-label': 'search' }}
+                onChange={(event) => setSearchText(event.target.value)}
+              />
+            </div>
+            {/* <Search display = "if MainPAge"></Search> */}
+          </Toolbar>
+        </AppBar>
+      </div>
       <ul>
         { 
           catalogue.tables.map( table => <li key={table.name}><Link to={`/${table.name}`}>{table.name}</Link></li>)
@@ -34,8 +123,7 @@ function App() {
         <Route path="/:tableName" children={<TablePage data={catalogue}/>} />
         <Route path="/" children={
           <div>
-            <h1>Catalogue</h1>
-            Search: <input type="text" value={searhText} onChange={(event) => setSearchText(event.target.value)}/>
+            {/* Search: <input type="text" value={searhText} onChange={(event) => setSearchText(event.target.value)}/> */}
             { catalogue.tables.map(table => <TableView key={table.name} data={table} filter={searhText} />)}
           </div>
         }/>
@@ -68,29 +156,31 @@ function TableView({data, filter}: TableViewProps) {
 
   return (
     <div>
-      <h2><Link to={`/${data.name}`}>{data.name}</Link></h2>
-      <table>
-        <thead>
-          <tr>
-            <td>Name</td>
-            <td>Type</td>
-            <td>Description</td>
-            <td>Link</td>
-          </tr>
-        </thead>
-        <tbody>
-          {data.columns
-            .filter(column => column.name.includes(filter !== undefined ? filter : ""))
-            .map(column => (
-            <tr key={column.name}>
-              <td>{column.name}</td>
-              <td>{column.type}</td>
-              <td>{column.description}</td>
-              <td>{column.link}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <Typography variant="h6"><Link to={`/${data.name}`}>{data.name}</Link></Typography>
+      {/* <TableContainer component={Paper}> */}
+        <TableUI size="small" aria-label="simple table" style={{width: 0}}>
+          <TableHead>
+            <TableRow>
+              <TableCell>Name</TableCell>
+              <TableCell align="right">Type</TableCell>
+              <TableCell>Description</TableCell>
+              <TableCell align="right">Link</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {data.columns
+              .filter(column => column.name.toLowerCase().includes(filter !== undefined ? filter.toLowerCase() : ""))
+              .map(column => (
+              <TableRow key={column.name}>
+                <TableCell>{column.name}</TableCell>
+                <TableCell align="right">{column.type}</TableCell>
+                <TableCell>{column.description}</TableCell>
+                <TableCell align="right">{column.link}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </TableUI>
+      {/* </TableContainer> */}
     </div>
   );
 }

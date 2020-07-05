@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 
 import {Catalogue, Column, ColumnType, Table} from './data';
@@ -11,14 +11,22 @@ import {
 } from "react-router-dom";
 
 function App() {
-  const [searhText, setSearchText] = useState("");
+  const [searhText, setSearchText] = useState("")
+  const [catalogue, setCatalogue] = useState<Catalogue>({tables: []})
+
+  useEffect(
+    () => {
+      fetch("/catalogue.json")
+      .then(response => response.json())
+      .then(responseJson => setCatalogue(responseJson))
+  }, [])
 
   return (
     <Router>
       <Link to="/">Home</Link>
       <ul>
         { 
-          catalogue.tables.map( table => <li><Link to={`/${table.name}`}>{table.name}</Link></li>)
+          catalogue.tables.map( table => <li key={table.name}><Link to={`/${table.name}`}>{table.name}</Link></li>)
         }
       </ul>
       <hr/>
@@ -28,7 +36,7 @@ function App() {
           <div>
             <h1>Catalogue</h1>
             Search: <input type="text" value={searhText} onChange={(event) => setSearchText(event.target.value)}/>
-            { catalogue.tables.map(table => <TableView data={table} filter={searhText} />)}
+            { catalogue.tables.map(table => <TableView key={table.name} data={table} filter={searhText} />)}
           </div>
         }/>
       </Switch>
@@ -70,69 +78,21 @@ function TableView({data, filter}: TableViewProps) {
             <td>Link</td>
           </tr>
         </thead>
-        {data.columns
-          .filter(column => column.name.includes(filter !== undefined ? filter : ""))
-          .map(column => (
-          <tr>
-            <td>{column.name}</td>
-            <td>{column.type}</td>
-            <td>{column.description}</td>
-            <td>{column.link}</td>
-          </tr>
-        ))}
+        <tbody>
+          {data.columns
+            .filter(column => column.name.includes(filter !== undefined ? filter : ""))
+            .map(column => (
+            <tr key={column.name}>
+              <td>{column.name}</td>
+              <td>{column.type}</td>
+              <td>{column.description}</td>
+              <td>{column.link}</td>
+            </tr>
+          ))}
+        </tbody>
       </table>
     </div>
   );
-}
-
-function col(name: String, type: ColumnType, description?: String, link?: String):Column {
-  return { name: name, type: type, description: description, link: link }
-}
-
-//https://github.com/yugabyte/yugabyte-db/blob/master/sample/clubdata_ddl.sql
-let catalogue: Catalogue = {
-  tables: [
-    {
-      name: "facilities",
-      location: { url: "s3://mydata/facility" },
-      storedFormat: { type: "parquet "},
-      columns: [
-        col("facid", ColumnType.Integer),
-        col("name", ColumnType.String),
-        col("membercost", ColumnType.Double),
-        col("guestcost", ColumnType.Double),
-        col("initialoutlay", ColumnType.Integer),
-        col("monthlymaintenance", ColumnType.Double)
-      ]
-    },
-    {
-      name: "members",
-      location: { url: "s3://mydata/members" },
-      storedFormat: { type: "parquet "},
-      columns: [
-        col("memid", ColumnType.Integer),
-        col("surname", ColumnType.String),
-        col("firstname", ColumnType.String),
-        col("address", ColumnType.String),
-        col("zipcode", ColumnType.Integer),
-        col("telephone", ColumnType.String),
-        col("recommendedby", ColumnType.Double, "Recommend by which member", "members:memid"),
-        col("joindate", ColumnType.Timestamp),
-      ]
-    },
-    {
-      name: "bookings",
-      location: { url: "s3://mydata/bookings" },
-      storedFormat: { type: "parquet "},
-      columns: [
-        col("bookid", ColumnType.Integer),
-        col("facid", ColumnType.Integer, "Facility", "factilities::facid"),
-        col("memid", ColumnType.Integer, "Member", "members::memid"),
-        col("starttime", ColumnType.Timestamp),
-        col("slots", ColumnType.Integer),
-      ]
-    }
-  ]
 }
 
 export default App;

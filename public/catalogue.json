@@ -1,0 +1,119 @@
+{
+    "tables": [
+        {
+            "name": "facilities",
+            "location": {
+                "url": "s3://mydata/facility"
+            },
+            "storedFormat": {
+                "type": "parquet "
+            },
+            "columns": [
+                {
+                    "name": "facid",
+                    "type": "Integer"
+                },
+                {
+                    "name": "name",
+                    "type": "String"
+                },
+                {
+                    "name": "membercost",
+                    "type": "Double"
+                },
+                {
+                    "name": "guestcost",
+                    "type": "Double"
+                },
+                {
+                    "name": "initialoutlay",
+                    "type": "Integer"
+                },
+                {
+                    "name": "monthlymaintenance",
+                    "type": "Double"
+                }
+            ]
+        },
+        {
+            "name": "members",
+            "location": {
+                "url": "s3://mydata/members"
+            },
+            "storedFormat": {
+                "type": "parquet "
+            },
+            "columns": [
+                {
+                    "name": "memid",
+                    "type": "Integer"
+                },
+                {
+                    "name": "surname",
+                    "type": "String"
+                },
+                {
+                    "name": "firstname",
+                    "type": "String"
+                },
+                {
+                    "name": "address",
+                    "type": "String"
+                },
+                {
+                    "name": "zipcode",
+                    "type": "Integer"
+                },
+                {
+                    "name": "telephone",
+                    "type": "String"
+                },
+                {
+                    "name": "recommendedby",
+                    "type": "Double",
+                    "description": "Recommend by which member",
+                    "link": "members:memid"
+                },
+                {
+                    "name": "joindate",
+                    "type": "Timestamp"
+                }
+            ]
+        },
+        {
+            "name": "bookings",
+            "location": {
+                "url": "s3://mydata/bookings"
+            },
+            "storedFormat": {
+                "type": "parquet "
+            },
+            "columns": [
+                {
+                    "name": "bookid",
+                    "type": "Integer"
+                },
+                {
+                    "name": "facid",
+                    "type": "Integer",
+                    "description": "Facility",
+                    "link": "factilities::facid"
+                },
+                {
+                    "name": "memid",
+                    "type": "Integer",
+                    "description": "Member",
+                    "link": "members::memid"
+                },
+                {
+                    "name": "starttime",
+                    "type": "Timestamp"
+                },
+                {
+                    "name": "slots",
+                    "type": "Integer"
+                }
+            ]
+        }
+    ]
+}

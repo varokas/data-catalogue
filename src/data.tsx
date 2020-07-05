@@ -4,7 +4,7 @@ export interface Catalogue {
 
 export interface Table {
   name: string
-  location: Location
+  location: S3Location
   storedFormat: StoredFormat
   columns: Column[]
   sample?: Sample
@@ -22,10 +22,7 @@ interface Sample {
   rows: string[][]
 }
 
-interface Location {
-}
-
-interface S3Location extends Location {
+interface S3Location {
   url: string
 }
 

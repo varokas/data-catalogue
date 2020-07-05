@@ -161,15 +161,18 @@ function TableView({data, filter}: TableViewProps) {
 
   return (
     <div>
-      <Typography variant="h6">{data.name} <Link to={`/${data.name}`}><LinkIcon/></Link></Typography>
+      <Typography variant="h5">{data.name} <Link to={`/${data.name}`}><LinkIcon/></Link></Typography>
+      <p>
+        Location: <code style={{ backgroundColor: "#CCCCCC" }}>{data.location.url}</code>
+      </p>
       {/* <TableContainer component={Paper}> */}
         <TableUI size="small" aria-label="simple table" style={{width: 0}}>
           <TableHead>
             <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell align="right">Type</TableCell>
-              <TableCell>Description</TableCell>
-              <TableCell align="right">Link</TableCell>
+              <TableCell style={{minWidth: "100px"}}>Name</TableCell>
+              <TableCell style={{minWidth: "100px"}} align="right">Type</TableCell>
+              <TableCell style={{minWidth: "300px"}}>Description</TableCell>
+              <TableCell style={{minWidth: "100px"}} align="right">Link</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
